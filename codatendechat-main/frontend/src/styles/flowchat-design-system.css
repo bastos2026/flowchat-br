@@ -1,0 +1,709 @@
+/* ========================================
+   FLOWCHAT BR - DESIGN SYSTEM ULTRA MODERNO
+   ======================================== */
+
+:root {
+  /* ===== CORES BRASILEIRAS ===== */
+  --color-primary: #009B3A;     /* Verde brasileiro */
+  --color-secondary: #0066CC;   /* Azul moderno */
+  --color-whatsapp: #25D366;    /* Verde WhatsApp */
+  --color-success: #28a745;
+  --color-warning: #ffc107;
+  --color-danger: #dc3545;
+  --color-info: #17a2b8;
+  
+  /* ===== BACKGROUNDS ===== */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-glass: rgba(255, 255, 255, 0.25);
+  --bg-glass-dark: rgba(0, 0, 0, 0.25);
+  
+  /* ===== TEXTOS ===== */
+  --text-primary: #2c3e50;
+  --text-secondary: #6c757d;
+  --text-light: #ffffff;
+  
+  /* ===== SOMBRAS ===== */
+  --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.1);
+  
+  /* ===== TRANSIÇÕES ===== */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.3s ease-in-out;
+  --transition-slow: 0.5s ease-in-out;
+  
+  /* ===== BORDAS ===== */
+  --border-radius-sm: 8px;
+  --border-radius: 12px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 24px;
+  
+  /* ===== ESPAÇAMENTOS ===== */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+}
+
+/* ===== DARK MODE ===== */
+[data-theme="dark"] {
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-glass: rgba(255, 255, 255, 0.1);
+  --bg-glass-dark: rgba(0, 0, 0, 0.4);
+  --text-primary: #f0f6fc;
+  --text-secondary: #8b949e;
+}
+
+/* ===== GLASSMORPHISM ===== */
+.glass-card {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: var(--shadow-glass);
+  border-radius: var(--border-radius);
+}
+
+.glass-card-dark {
+  background: var(--bg-glass-dark);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--shadow-glass);
+  border-radius: var(--border-radius);
+}
+
+/* ===== ANIMAÇÕES MODERNAS ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+/* ===== CLASSES DE ANIMAÇÃO ===== */
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.6s ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite;
+}
+
+/* ===== CARDS MODERNOS ===== */
+.flowchat-card {
+  background: var(--bg-primary);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  transition: var(--transition-normal);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.flowchat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
+}
+
+.flowchat-card.glass {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: var(--shadow-glass);
+}
+
+/* ===== BOTÕES MODERNOS ===== */
+.flowchat-btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius);
+  border: none;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.flowchat-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: var(--transition-normal);
+}
+
+.flowchat-btn:hover::before {
+  left: 100%;
+}
+
+.flowchat-btn-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: var(--text-light);
+}
+
+.flowchat-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.flowchat-btn-secondary {
+  background: var(--bg-glass);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.flowchat-btn-whatsapp {
+  background: linear-gradient(135deg, var(--color-whatsapp), #128c7e);
+  color: var(--text-light);
+}
+
+/* ===== HEADER ULTRA MODERNO ===== */
+.flowchat-header {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: var(--spacing-md) var(--spacing-xl);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flowchat-header .logo {
+  height: 40px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.flowchat-header .nav-links {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: center;
+}
+
+.flowchat-header .nav-link {
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 500;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius);
+  transition: var(--transition-normal);
+  position: relative;
+}
+
+.flowchat-header .nav-link:hover {
+  background: var(--bg-glass);
+  color: var(--color-primary);
+}
+
+.flowchat-header .nav-link.active {
+  background: var(--color-primary);
+  color: var(--text-light);
+}
+
+/* ===== SIDEBAR RESPONSIVA ===== */
+.flowchat-sidebar {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  width: 280px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 999;
+  transition: var(--transition-normal);
+  overflow-y: auto;
+}
+
+.flowchat-sidebar.collapsed {
+  width: 70px;
+}
+
+.flowchat-sidebar .menu-item {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-md);
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: var(--transition-normal);
+  border-radius: var(--border-radius-sm);
+  margin: var(--spacing-xs) var(--spacing-sm);
+  position: relative;
+}
+
+.flowchat-sidebar .menu-item:hover {
+  background: var(--bg-glass);
+  color: var(--color-primary);
+  transform: translateX(5px);
+}
+
+.flowchat-sidebar .menu-item.active {
+  background: var(--color-primary);
+  color: var(--text-light);
+}
+
+.flowchat-sidebar .menu-item .icon {
+  width: 24px;
+  height: 24px;
+  margin-right: var(--spacing-md);
+  transition: var(--transition-normal);
+}
+
+.flowchat-sidebar .menu-item .badge {
+  position: absolute;
+  right: var(--spacing-sm);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--color-danger);
+  color: var(--text-light);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* ===== DASHBOARD MODERNO ===== */
+.flowchat-dashboard {
+  padding: var(--spacing-xl);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+  min-height: 100vh;
+}
+
+.flowchat-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.flowchat-stat-card {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.flowchat-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+}
+
+.flowchat-stat-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-hover);
+}
+
+.flowchat-stat-card .stat-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light);
+  font-size: 24px;
+  margin-bottom: var(--spacing-md);
+}
+
+.flowchat-stat-card .stat-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.flowchat-stat-card .stat-label {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ===== LEADS EXPANDIDOS ===== */
+.flowchat-leads-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.flowchat-lead-card {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: var(--transition-normal);
+  cursor: pointer;
+}
+
+.flowchat-lead-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
+}
+
+.flowchat-lead-card .lead-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.flowchat-lead-card .lead-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light);
+  font-size: 20px;
+  font-weight: bold;
+  margin-right: var(--spacing-md);
+}
+
+.flowchat-lead-card .lead-info h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.flowchat-lead-card .lead-info p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.flowchat-lead-card .lead-value {
+  margin-left: auto;
+  background: linear-gradient(135deg, var(--color-success), #20c997);
+  color: var(--text-light);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.flowchat-lead-card .lead-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+}
+
+.flowchat-lead-card .lead-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.flowchat-lead-card .lead-field .label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.flowchat-lead-card .lead-field a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.flowchat-lead-card .origin-badge {
+  background: var(--color-info);
+  color: var(--text-light);
+  padding: 2px var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.flowchat-lead-card .status-badge {
+  padding: 2px var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.flowchat-lead-card .status-badge.novo {
+  background: var(--color-info);
+  color: var(--text-light);
+}
+
+.flowchat-lead-card .status-badge.contato {
+  background: var(--color-warning);
+  color: var(--text-primary);
+}
+
+.flowchat-lead-card .status-badge.qualificado {
+  background: var(--color-success);
+  color: var(--text-light);
+}
+
+.flowchat-lead-card .status-badge.convertido {
+  background: var(--color-primary);
+  color: var(--text-light);
+}
+
+/* ===== CHAT MODERNO ===== */
+.flowchat-chat-container {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--border-radius-lg);
+  height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.flowchat-chat-header {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.flowchat-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.flowchat-message {
+  max-width: 70%;
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-lg);
+  position: relative;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.flowchat-message.received {
+  background: var(--bg-glass);
+  align-self: flex-start;
+  border-bottom-left-radius: var(--border-radius-sm);
+}
+
+.flowchat-message.sent {
+  background: linear-gradient(135deg, var(--color-whatsapp), #128c7e);
+  color: var(--text-light);
+  align-self: flex-end;
+  border-bottom-right-radius: var(--border-radius-sm);
+}
+
+.flowchat-message .message-time {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: var(--spacing-xs);
+  text-align: right;
+}
+
+.flowchat-chat-input {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.flowchat-chat-input input {
+  flex: 1;
+  background: var(--bg-glass);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.flowchat-chat-input input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 155, 58, 0.1);
+}
+
+.flowchat-chat-input button {
+  background: var(--color-whatsapp);
+  color: var(--text-light);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-normal);
+}
+
+.flowchat-chat-input button:hover {
+  transform: scale(1.1);
+  box-shadow: var(--shadow);
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+  .flowchat-sidebar {
+    transform: translateX(-100%);
+  }
+  
+  .flowchat-sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .flowchat-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .flowchat-leads-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .flowchat-header {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+  
+  .flowchat-dashboard {
+    padding: var(--spacing-md);
+  }
+}
+
+/* ===== UTILITÁRIOS ===== */
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-border {
+  position: relative;
+  background: var(--bg-primary);
+  border-radius: var(--border-radius);
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: var(--border-radius);
+  padding: 2px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ===== SCROLLBAR PERSONALIZADA ===== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  border-radius: var(--border-radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+} 
