@@ -104,8 +104,12 @@ chown -R deploy:deploy /home/deploy/$INSTANCE_NAME
 
 # 8. Configurar banco PostgreSQL
 print_status "Configurando banco de dados..."
-sudo -u postgres psql -c "DROP USER IF EXISTS $INSTANCE_NAME;"
-sudo -u postgres psql -c "DROP DATABASE IF EXISTS $INSTANCE_NAME;"
+# Forçar desconexão de todas as sessões do banco
+sudo -u postgres psql -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$INSTANCE_NAME' AND pid <> pg_backend_pid();" 2>/dev/null || true
+# Remover banco primeiro, depois usuário
+sudo -u postgres psql -c "DROP DATABASE IF EXISTS $INSTANCE_NAME;" 2>/dev/null || true
+sudo -u postgres psql -c "DROP USER IF EXISTS $INSTANCE_NAME;" 2>/dev/null || true
+# Criar usuário e banco novamente
 sudo -u postgres psql -c "CREATE USER $INSTANCE_NAME WITH PASSWORD '$MYSQL_PASSWORD';"
 sudo -u postgres psql -c "CREATE DATABASE $INSTANCE_NAME OWNER $INSTANCE_NAME;"
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $INSTANCE_NAME TO $INSTANCE_NAME;"
