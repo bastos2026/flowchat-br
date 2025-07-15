@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Instalador FlowChat Híbrido - Versão Alternativa
-# Baixa do repositório do usuário
+# Instalador FlowChat Simples - Sem Dependências Problemáticas
+# Backend original + Frontend com cores brasileiras básicas
 
 set -e
 
@@ -30,8 +30,8 @@ print_info() {
 
 # Banner
 echo "========================================"
-echo "    FLOWCHAT HÍBRIDO - INSTALADOR"
-echo "    Backend Original + Frontend Moderno"
+echo "    FLOWCHAT SIMPLES - INSTALADOR"
+echo "    Backend Original + Cores Brasileiras"
 echo "========================================"
 echo
 
@@ -47,15 +47,14 @@ echo
 read -p "Nome da instância (ex: flowchat): " INSTANCE_NAME
 read -p "Domínio (ex: flowchat.com): " DOMAIN
 read -p "Senha para deploy e banco: " MYSQL_PASSWORD
-read -p "Seu usuário GitHub (ex: bastos2026): " GITHUB_USER
 
 # Validar entradas
-if [ -z "$INSTANCE_NAME" ] || [ -z "$DOMAIN" ] || [ -z "$MYSQL_PASSWORD" ] || [ -z "$GITHUB_USER" ]; then
+if [ -z "$INSTANCE_NAME" ] || [ -z "$DOMAIN" ] || [ -z "$MYSQL_PASSWORD" ]; then
     print_error "Todos os campos são obrigatórios!"
     exit 1
 fi
 
-print_status "Iniciando instalação do FlowChat Híbrido..."
+print_status "Iniciando instalação do FlowChat Simples..."
 
 # 1. Instalar dependências
 print_status "Instalando dependências..."
@@ -100,144 +99,103 @@ docker stop redis-$INSTANCE_NAME 2>/dev/null || true
 docker rm redis-$INSTANCE_NAME 2>/dev/null || true
 docker run --name redis-$INSTANCE_NAME -p 6379:6379 --restart always -d redis redis-server --requirepass $MYSQL_PASSWORD
 
-# 8. Baixar código do repositório do usuário
-print_status "Baixando código do seu repositório..."
+# 8. Baixar código original
+print_status "Baixando código original..."
 cd /home/deploy
-sudo -u deploy git clone https://github.com/$GITHUB_USER/flowchat-br.git $INSTANCE_NAME
+sudo -u deploy git clone https://github.com/codatendechat/flowchat.git $INSTANCE_NAME
 cd $INSTANCE_NAME
 
-# 9. Copiar código modificado
-print_status "Copiando código modificado..."
-sudo -u deploy cp -r codatendechat-main/* .
-sudo -u deploy rm -rf codatendechat-main
-
-# 10. Aplicar modificações visuais no frontend
-print_status "Aplicando design moderno brasileiro..."
+# 9. Aplicar cores brasileiras básicas
+print_status "Aplicando cores brasileiras..."
 cd frontend
 
-# Instalar dependências adicionais para o design moderno (versão compatível)
-sudo -u deploy npm install @mui/material @emotion/react @emotion/styled @mui/icons-material --legacy-peer-deps
+# Criar arquivo de cores brasileiras
+mkdir -p src/styles
+cat > src/styles/brazilianColors.css << 'EOF'
+/* Cores da Bandeira Brasileira */
+:root {
+  --brazil-green: #009c3b;
+  --brazil-yellow: #ffdf00;
+  --brazil-blue: #002776;
+  --brazil-white: #ffffff;
+}
 
-# Criar arquivo de tema brasileiro
-cat > src/theme/brazilianTheme.js << 'EOF'
-import { createTheme } from '@mui/material/styles';
+/* Aplicar cores nos elementos principais */
+.MuiAppBar-root {
+  background: linear-gradient(135deg, var(--brazil-green) 0%, #00d152 100%) !important;
+  border-bottom: 3px solid var(--brazil-yellow) !important;
+}
 
-export const brazilianTheme = createTheme({
-  palette: {
-    primary: {
-      main: '#009c3b', // Verde da bandeira
-      light: '#00d152',
-      dark: '#006b2a',
-    },
-    secondary: {
-      main: '#ffdf00', // Amarelo da bandeira
-      light: '#ffe55c',
-      dark: '#e6c900',
-    },
-    background: {
-      default: '#f8f9fa',
-      paper: '#ffffff',
-    },
-    text: {
-      primary: '#2c3e50',
-      secondary: '#7f8c8d',
-    },
-  },
-  typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-    h1: {
-      fontWeight: 700,
-      fontSize: '2.5rem',
-    },
-    h2: {
-      fontWeight: 600,
-      fontSize: '2rem',
-    },
-    h3: {
-      fontWeight: 600,
-      fontSize: '1.75rem',
-    },
-    h4: {
-      fontWeight: 500,
-      fontSize: '1.5rem',
-    },
-    h5: {
-      fontWeight: 500,
-      fontSize: '1.25rem',
-    },
-    h6: {
-      fontWeight: 500,
-      fontSize: '1rem',
-    },
-  },
-  shape: {
-    borderRadius: 12,
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-          borderRadius: 8,
-          fontWeight: 600,
-          padding: '10px 24px',
-        },
-        contained: {
-          boxShadow: '0 4px 12px rgba(0, 156, 59, 0.3)',
-          '&:hover': {
-            boxShadow: '0 6px 16px rgba(0, 156, 59, 0.4)',
-          },
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: 16,
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
-          border: '1px solid rgba(0, 0, 0, 0.05)',
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-        },
-      },
-    },
-  },
-});
+.MuiButton-contained {
+  background-color: var(--brazil-green) !important;
+  color: white !important;
+}
 
-export const darkTheme = createTheme({
-  ...brazilianTheme,
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#00d152',
-      light: '#00ff6b',
-      dark: '#009c3b',
-    },
-    secondary: {
-      main: '#ffdf00',
-      light: '#ffe55c',
-      dark: '#e6c900',
-    },
-    background: {
-      default: '#0a0a0a',
-      paper: '#1a1a1a',
-    },
-    text: {
-      primary: '#ffffff',
-      secondary: '#b0b0b0',
-    },
-  },
-});
+.MuiButton-contained:hover {
+  background-color: #00d152 !important;
+}
+
+.MuiFab-primary {
+  background-color: var(--brazil-green) !important;
+}
+
+.MuiFab-primary:hover {
+  background-color: #00d152 !important;
+}
+
+/* Header brasileiro */
+.app-header {
+  background: linear-gradient(135deg, var(--brazil-green) 0%, #00d152 100%);
+  border-bottom: 3px solid var(--brazil-yellow);
+  color: white;
+}
+
+/* Botões brasileiros */
+.btn-brazil {
+  background: linear-gradient(45deg, var(--brazil-green) 30%, #00d152 90%);
+  border: 0;
+  border-radius: 8px;
+  color: white;
+  padding: 10px 24px;
+  font-weight: 600;
+  text-transform: none;
+  box-shadow: 0 4px 12px rgba(0, 156, 59, 0.3);
+}
+
+.btn-brazil:hover {
+  background: linear-gradient(45deg, #00d152 30%, #00ff6b 90%);
+  box-shadow: 0 6px 16px rgba(0, 156, 59, 0.4);
+}
+
+/* Cards brasileiros */
+.card-brazil {
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 156, 59, 0.1);
+}
+
+/* Logo brasileiro */
+.logo-brazil {
+  background: linear-gradient(45deg, var(--brazil-white) 30%, var(--brazil-yellow) 90%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
 EOF
+
+# Adicionar import no App.js
+if [ -f "src/App.js" ]; then
+    # Verificar se já tem o import
+    if ! grep -q "brazilianColors.css" src/App.js; then
+        # Adicionar import no início do arquivo
+        sed -i '1i import "./styles/brazilianColors.css";' src/App.js
+    fi
+fi
 
 cd ..
 
-# 11. Configurar backend
+# 10. Configurar backend
 print_status "Configurando backend..."
 cat > backend/.env << EOF
 NODE_ENV=production
@@ -265,7 +223,7 @@ CONNECTIONS_LIMIT=10
 CLOSED_SEND_BY_ME=true
 EOF
 
-# 12. Configurar frontend
+# 11. Configurar frontend
 print_status "Configurando frontend..."
 cat > frontend/.env << EOF
 REACT_APP_BACKEND_URL=https://$DOMAIN
@@ -273,12 +231,12 @@ REACT_APP_HOURS_CLOSE_TICKETS_AUTO=24
 REACT_APP_REACT_APP_URL_API=https://$DOMAIN
 EOF
 
-# 13. Instalar dependências
+# 12. Instalar dependências
 print_status "Instalando dependências..."
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npm install"
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/frontend && npm install"
 
-# 14. Build e migrações
+# 13. Build e migrações
 print_status "Fazendo build e migrações..."
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npm run build"
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npx sequelize db:migrate"
@@ -286,7 +244,7 @@ sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npx sequelize 
 
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/frontend && npm run build"
 
-# 15. Configurar Nginx
+# 14. Configurar Nginx
 print_status "Configurando Nginx..."
 cat > /etc/nginx/sites-available/$INSTANCE_NAME << EOF
 server {
@@ -324,14 +282,14 @@ rm -f /etc/nginx/sites-enabled/default
 nginx -t
 systemctl restart nginx
 
-# 16. Iniciar aplicações
+# 15. Iniciar aplicações
 print_status "Iniciando aplicações..."
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && pm2 start dist/server.js --name $INSTANCE_NAME-backend"
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/frontend && pm2 start npm --name $INSTANCE_NAME-frontend -- start"
 sudo -u deploy bash -c "pm2 save"
 sudo -u deploy bash -c "pm2 startup"
 
-# 17. Configurar SSL
+# 16. Configurar SSL
 print_warning "Configure o domínio DNS antes de continuar:"
 print_info "  $DOMAIN -> $(curl -s ifconfig.me)"
 echo
@@ -348,15 +306,15 @@ else
     print_info "certbot --nginx -d $DOMAIN"
 fi
 
-# 18. Finalizar
+# 17. Finalizar
 echo
 echo "========================================"
-echo "    INSTALAÇÃO HÍBRIDA CONCLUÍDA!"
+echo "    INSTALAÇÃO SIMPLES CONCLUÍDA!"
 echo "========================================"
 echo
-print_status "Sistema FlowChat Híbrido instalado!"
+print_status "Sistema FlowChat Simples instalado!"
 print_info "✅ Backend original (estável)"
-print_info "✅ Frontend moderno brasileiro"
+print_info "✅ Cores brasileiras aplicadas"
 echo
 print_info "🌐 URL de acesso: https://$DOMAIN"
 echo
@@ -371,8 +329,8 @@ print_info "👤 Usuário padrão:"
 print_info "  Email: admin@admin.com"
 print_info "  Senha: 123456"
 echo
-print_info "🎨 Design aplicado:"
-print_info "  ✅ Cores da bandeira brasileira"
-print_info "  ✅ Material-UI moderno"
-print_info "  ✅ Animações suaves"
-print_info "  ✅ Layout responsivo" 
+print_info "🎨 Cores aplicadas:"
+print_info "  ✅ Verde da bandeira (#009c3b)"
+print_info "  ✅ Amarelo da bandeira (#ffdf00)"
+print_info "  ✅ Gradientes brasileiros"
+print_info "  ✅ CSS customizado" 
