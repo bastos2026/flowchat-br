@@ -102,12 +102,16 @@ chown -R deploy:deploy /home/deploy/$INSTANCE_NAME
 
 # 8. Configurar banco PostgreSQL
 print_status "Configurando banco de dados..."
+sudo -u postgres psql -c "DROP USER IF EXISTS $INSTANCE_NAME;"
+sudo -u postgres psql -c "DROP DATABASE IF EXISTS $INSTANCE_NAME;"
 sudo -u postgres psql -c "CREATE USER $INSTANCE_NAME WITH PASSWORD '$MYSQL_PASSWORD';"
 sudo -u postgres psql -c "CREATE DATABASE $INSTANCE_NAME OWNER $INSTANCE_NAME;"
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $INSTANCE_NAME TO $INSTANCE_NAME;"
 
 # 9. Configurar Redis
 print_status "Configurando Redis..."
+docker stop redis-$INSTANCE_NAME 2>/dev/null || true
+docker rm redis-$INSTANCE_NAME 2>/dev/null || true
 docker run --name redis-$INSTANCE_NAME -p $REDIS_PORT:6379 --restart always -d redis redis-server --requirepass $MYSQL_PASSWORD
 
 # 10. Configurar backend
