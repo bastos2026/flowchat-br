@@ -98,7 +98,7 @@ fi
 
 # Configurar permissões
 print_status "Configurando permissões..."
-chmod +x instalador-main/install.sh
+chmod +x instalador-main/install_primaria
 
 # Configurar Nginx
 print_status "Configurando Nginx..."
@@ -201,7 +201,7 @@ fi
 # Executar instalador automático
 print_status "Executando instalador automático..."
 cd instalador-main
-./install.sh
+./install_primaria
 
 if [ $? -eq 0 ]; then
     echo
