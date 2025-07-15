@@ -39,7 +39,8 @@ system_git_clone() {
   sleep 2
 
   sudo su - deploy <<EOF
-  git clone https://atendechat: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@github.com/atendechat/codatendechat.git /home/deploy/${instancia_add}/
+  # Usar nosso código modificado (FlowChatBR sem filas)
+  cp -r /root/flowchat-br/codatendechat-main /home/deploy/${instancia_add}/
 
   sleep 2
 }
