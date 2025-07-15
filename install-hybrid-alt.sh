@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Instalador FlowChat Híbrido
-# Backend original (estável) + Frontend moderno brasileiro
+# Instalador FlowChat Híbrido - Versão Alternativa
+# Baixa do repositório do usuário
 
 set -e
 
@@ -47,9 +47,10 @@ echo
 read -p "Nome da instância (ex: flowchat): " INSTANCE_NAME
 read -p "Domínio (ex: flowchat.com): " DOMAIN
 read -p "Senha para deploy e banco: " MYSQL_PASSWORD
+read -p "Seu usuário GitHub (ex: bastos2026): " GITHUB_USER
 
 # Validar entradas
-if [ -z "$INSTANCE_NAME" ] || [ -z "$DOMAIN" ] || [ -z "$MYSQL_PASSWORD" ]; then
+if [ -z "$INSTANCE_NAME" ] || [ -z "$DOMAIN" ] || [ -z "$MYSQL_PASSWORD" ] || [ -z "$GITHUB_USER" ]; then
     print_error "Todos os campos são obrigatórios!"
     exit 1
 fi
@@ -99,13 +100,18 @@ docker stop redis-$INSTANCE_NAME 2>/dev/null || true
 docker rm redis-$INSTANCE_NAME 2>/dev/null || true
 docker run --name redis-$INSTANCE_NAME -p 6379:6379 --restart always -d redis redis-server --requirepass $MYSQL_PASSWORD
 
-# 8. Baixar código original
-print_status "Baixando código original..."
+# 8. Baixar código do repositório do usuário
+print_status "Baixando código do seu repositório..."
 cd /home/deploy
-sudo -u deploy git clone https://github.com/codatendechat/flowchat.git $INSTANCE_NAME
+sudo -u deploy git clone https://github.com/$GITHUB_USER/flowchat-br.git $INSTANCE_NAME
 cd $INSTANCE_NAME
 
-# 9. Aplicar modificações visuais no frontend
+# 9. Copiar código modificado
+print_status "Copiando código modificado..."
+sudo -u deploy cp -r codatendechat-main/* .
+sudo -u deploy rm -rf codatendechat-main
+
+# 10. Aplicar modificações visuais no frontend
 print_status "Aplicando design moderno brasileiro..."
 cd frontend
 
@@ -229,113 +235,10 @@ export const darkTheme = createTheme({
 });
 EOF
 
-# Criar componente de layout moderno
-mkdir -p src/components/Layout
-cat > src/components/Layout/ModernLayout.js << 'EOF'
-import React from 'react';
-import { Box, Container, CssBaseline, ThemeProvider } from '@mui/material';
-import { brazilianTheme } from '../../theme/brazilianTheme';
-
-const ModernLayout = ({ children }) => {
-  return (
-    <ThemeProvider theme={brazilianTheme}>
-      <CssBaseline />
-      <Box
-        sx={{
-          minHeight: '100vh',
-          background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
-          backgroundAttachment: 'fixed',
-        }}
-      >
-        <Container maxWidth="xl" sx={{ py: 2 }}>
-          {children}
-        </Container>
-      </Box>
-    </ThemeProvider>
-  );
-};
-
-export default ModernLayout;
-EOF
-
-# Criar componente de header brasileiro
-mkdir -p src/components/Header
-cat > src/components/Header/BrazilianHeader.js << 'EOF'
-import React from 'react';
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Box,
-  Button,
-  IconButton,
-  useTheme,
-} from '@mui/material';
-import { WhatsApp, Flag } from '@mui/icons-material';
-
-const BrazilianHeader = () => {
-  const theme = useTheme();
-
-  return (
-    <AppBar
-      position="static"
-      elevation={0}
-      sx={{
-        background: 'linear-gradient(135deg, #009c3b 0%, #00d152 100%)',
-        borderBottom: '3px solid #ffdf00',
-      }}
-    >
-      <Toolbar>
-        <Box display="flex" alignItems="center" flexGrow={1}>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            sx={{ mr: 2 }}
-          >
-            <Flag sx={{ color: '#ffdf00' }} />
-          </IconButton>
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{
-              fontWeight: 700,
-              background: 'linear-gradient(45deg, #ffffff 30%, #ffdf00 90%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}
-          >
-            FlowChat BR
-          </Typography>
-        </Box>
-        
-        <Box display="flex" alignItems="center" gap={1}>
-          <Button
-            color="inherit"
-            startIcon={<WhatsApp />}
-            sx={{
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.2)',
-              },
-            }}
-          >
-            Atendimento
-          </Button>
-        </Box>
-      </Toolbar>
-    </AppBar>
-  );
-};
-
-export default BrazilianHeader;
-EOF
-
 cd ..
 
-# 10. Configurar backend (original)
-print_status "Configurando backend original..."
+# 11. Configurar backend
+print_status "Configurando backend..."
 cat > backend/.env << EOF
 NODE_ENV=production
 BACKEND_URL=https://$DOMAIN
@@ -362,7 +265,7 @@ CONNECTIONS_LIMIT=10
 CLOSED_SEND_BY_ME=true
 EOF
 
-# 11. Configurar frontend
+# 12. Configurar frontend
 print_status "Configurando frontend..."
 cat > frontend/.env << EOF
 REACT_APP_BACKEND_URL=https://$DOMAIN
@@ -370,12 +273,12 @@ REACT_APP_HOURS_CLOSE_TICKETS_AUTO=24
 REACT_APP_REACT_APP_URL_API=https://$DOMAIN
 EOF
 
-# 12. Instalar dependências
+# 13. Instalar dependências
 print_status "Instalando dependências..."
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npm install"
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/frontend && npm install"
 
-# 13. Build e migrações
+# 14. Build e migrações
 print_status "Fazendo build e migrações..."
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npm run build"
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npx sequelize db:migrate"
@@ -383,7 +286,7 @@ sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npx sequelize 
 
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/frontend && npm run build"
 
-# 14. Configurar Nginx
+# 15. Configurar Nginx
 print_status "Configurando Nginx..."
 cat > /etc/nginx/sites-available/$INSTANCE_NAME << EOF
 server {
@@ -421,14 +324,14 @@ rm -f /etc/nginx/sites-enabled/default
 nginx -t
 systemctl restart nginx
 
-# 15. Iniciar aplicações
+# 16. Iniciar aplicações
 print_status "Iniciando aplicações..."
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && pm2 start dist/server.js --name $INSTANCE_NAME-backend"
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/frontend && pm2 start npm --name $INSTANCE_NAME-frontend -- start"
 sudo -u deploy bash -c "pm2 save"
 sudo -u deploy bash -c "pm2 startup"
 
-# 16. Configurar SSL
+# 17. Configurar SSL
 print_warning "Configure o domínio DNS antes de continuar:"
 print_info "  $DOMAIN -> $(curl -s ifconfig.me)"
 echo
@@ -445,7 +348,7 @@ else
     print_info "certbot --nginx -d $DOMAIN"
 fi
 
-# 17. Finalizar
+# 18. Finalizar
 echo
 echo "========================================"
 echo "    INSTALAÇÃO HÍBRIDA CONCLUÍDA!"
