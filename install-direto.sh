@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Instalador FlowChat Simples - Sem Dependências Problemáticas
-# Backend original + Frontend com cores brasileiras básicas
+# Instalador FlowChat Direto - Sem GitHub
+# Baixa direto do repositório público
 
 set -e
 
@@ -30,8 +30,8 @@ print_info() {
 
 # Banner
 echo "========================================"
-echo "    FLOWCHAT SIMPLES - INSTALADOR"
-echo "    Backend Original + Cores Brasileiras"
+echo "    FLOWCHAT DIRETO - INSTALADOR"
+echo "    Sem GitHub, Sem Problemas!"
 echo "========================================"
 echo
 
@@ -54,7 +54,7 @@ if [ -z "$INSTANCE_NAME" ] || [ -z "$DOMAIN" ] || [ -z "$MYSQL_PASSWORD" ]; then
     exit 1
 fi
 
-print_status "Iniciando instalação do FlowChat Simples..."
+print_status "Iniciando instalação do FlowChat Direto..."
 
 # 1. Instalar dependências
 print_status "Instalando dependências..."
@@ -99,13 +99,19 @@ docker stop redis-$INSTANCE_NAME 2>/dev/null || true
 docker rm redis-$INSTANCE_NAME 2>/dev/null || true
 docker run --name redis-$INSTANCE_NAME -p 6379:6379 --restart always -d redis redis-server --requirepass $MYSQL_PASSWORD
 
-# 8. Baixar código original
-print_status "Baixando código original..."
+# 8. Baixar código direto (sem GitHub)
+print_status "Baixando código direto..."
 cd /home/deploy
-# Remover diretório se existir
 sudo -u deploy rm -rf $INSTANCE_NAME
-sudo -u deploy git clone https://github.com/codatendechat/flowchat.git $INSTANCE_NAME
+sudo -u deploy mkdir $INSTANCE_NAME
 cd $INSTANCE_NAME
+
+# Baixar arquivos do repositório público
+print_status "Baixando arquivos do repositório público..."
+sudo -u deploy wget -O backend.zip "https://github.com/codatendechat/flowchat/archive/refs/heads/main.zip"
+sudo -u deploy unzip backend.zip
+sudo -u deploy mv flowchat-main/* .
+sudo -u deploy rm -rf flowchat-main backend.zip
 
 # 9. Aplicar cores brasileiras básicas
 print_status "Aplicando cores brasileiras..."
@@ -311,12 +317,13 @@ fi
 # 17. Finalizar
 echo
 echo "========================================"
-echo "    INSTALAÇÃO SIMPLES CONCLUÍDA!"
+echo "    INSTALAÇÃO DIRETA CONCLUÍDA!"
 echo "========================================"
 echo
-print_status "Sistema FlowChat Simples instalado!"
+print_status "Sistema FlowChat Direto instalado!"
 print_info "✅ Backend original (estável)"
 print_info "✅ Cores brasileiras aplicadas"
+print_info "✅ Sem problemas de GitHub!"
 echo
 print_info "🌐 URL de acesso: https://$DOMAIN"
 echo

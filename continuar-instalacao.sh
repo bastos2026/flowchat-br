@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Instalador FlowChat Simples - Sem Dependências Problemáticas
-# Backend original + Frontend com cores brasileiras básicas
+# Script para continuar instalação do FlowChat
+# Execute como root
 
 set -e
 
@@ -28,13 +28,6 @@ print_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
 }
 
-# Banner
-echo "========================================"
-echo "    FLOWCHAT SIMPLES - INSTALADOR"
-echo "    Backend Original + Cores Brasileiras"
-echo "========================================"
-echo
-
 # Verificar se é root
 if [ "$EUID" -ne 0 ]; then
     print_error "Execute este script como root (sudo)"
@@ -42,72 +35,25 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Solicitar informações
-echo "Configuração do Sistema:"
-echo
-read -p "Nome da instância (ex: flowchat): " INSTANCE_NAME
-read -p "Domínio (ex: flowchat.com): " DOMAIN
-read -p "Senha para deploy e banco: " MYSQL_PASSWORD
+read -p "Nome da instância (ex: flowchatbr): " INSTANCE_NAME
+read -p "Domínio (ex: flowchatbr.com): " DOMAIN
+read -p "Senha do banco: " MYSQL_PASSWORD
 
-# Validar entradas
 if [ -z "$INSTANCE_NAME" ] || [ -z "$DOMAIN" ] || [ -z "$MYSQL_PASSWORD" ]; then
     print_error "Todos os campos são obrigatórios!"
     exit 1
 fi
 
-print_status "Iniciando instalação do FlowChat Simples..."
+print_status "Continuando instalação do FlowChat..."
 
-# 1. Instalar dependências
-print_status "Instalando dependências..."
-apt update
-apt install -y curl wget git unzip software-properties-common nginx certbot python3-certbot-nginx mysql-server mysql-client
-
-# 2. Instalar Node.js
-print_status "Instalando Node.js..."
-curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-apt install -y nodejs
-
-# 3. Instalar Docker
-print_status "Instalando Docker..."
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-apt update
-apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-
-# 4. Instalar PM2
-print_status "Instalando PM2..."
-npm install -g pm2
-
-# 5. Criar usuário deploy
-print_status "Criando usuário deploy..."
-useradd -m -s /bin/bash -G sudo deploy 2>/dev/null || true
-echo "deploy:$MYSQL_PASSWORD" | chpasswd
-
-# 6. Configurar MySQL
-print_status "Configurando MySQL..."
-systemctl start mysql
-systemctl enable mysql
-
-# Configurar MySQL
-mysql -e "CREATE DATABASE IF NOT EXISTS $INSTANCE_NAME;"
-mysql -e "CREATE USER IF NOT EXISTS '$INSTANCE_NAME'@'localhost' IDENTIFIED BY '$MYSQL_PASSWORD';"
-mysql -e "GRANT ALL PRIVILEGES ON $INSTANCE_NAME.* TO '$INSTANCE_NAME'@'localhost';"
-mysql -e "FLUSH PRIVILEGES;"
-
-# 7. Configurar Redis
-print_status "Configurando Redis..."
-docker stop redis-$INSTANCE_NAME 2>/dev/null || true
-docker rm redis-$INSTANCE_NAME 2>/dev/null || true
-docker run --name redis-$INSTANCE_NAME -p 6379:6379 --restart always -d redis redis-server --requirepass $MYSQL_PASSWORD
-
-# 8. Baixar código original
+# 1. Remover diretório existente e baixar código
 print_status "Baixando código original..."
 cd /home/deploy
-# Remover diretório se existir
 sudo -u deploy rm -rf $INSTANCE_NAME
 sudo -u deploy git clone https://github.com/codatendechat/flowchat.git $INSTANCE_NAME
 cd $INSTANCE_NAME
 
-# 9. Aplicar cores brasileiras básicas
+# 2. Aplicar cores brasileiras básicas
 print_status "Aplicando cores brasileiras..."
 cd frontend
 
@@ -197,7 +143,7 @@ fi
 
 cd ..
 
-# 10. Configurar backend
+# 3. Configurar backend
 print_status "Configurando backend..."
 cat > backend/.env << EOF
 NODE_ENV=production
@@ -225,7 +171,7 @@ CONNECTIONS_LIMIT=10
 CLOSED_SEND_BY_ME=true
 EOF
 
-# 11. Configurar frontend
+# 4. Configurar frontend
 print_status "Configurando frontend..."
 cat > frontend/.env << EOF
 REACT_APP_BACKEND_URL=https://$DOMAIN
@@ -233,12 +179,12 @@ REACT_APP_HOURS_CLOSE_TICKETS_AUTO=24
 REACT_APP_REACT_APP_URL_API=https://$DOMAIN
 EOF
 
-# 12. Instalar dependências
+# 5. Instalar dependências
 print_status "Instalando dependências..."
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npm install"
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/frontend && npm install"
 
-# 13. Build e migrações
+# 6. Build e migrações
 print_status "Fazendo build e migrações..."
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npm run build"
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npx sequelize db:migrate"
@@ -246,7 +192,7 @@ sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npx sequelize 
 
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/frontend && npm run build"
 
-# 14. Configurar Nginx
+# 7. Configurar Nginx
 print_status "Configurando Nginx..."
 cat > /etc/nginx/sites-available/$INSTANCE_NAME << EOF
 server {
@@ -284,14 +230,14 @@ rm -f /etc/nginx/sites-enabled/default
 nginx -t
 systemctl restart nginx
 
-# 15. Iniciar aplicações
+# 8. Iniciar aplicações
 print_status "Iniciando aplicações..."
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && pm2 start dist/server.js --name $INSTANCE_NAME-backend"
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/frontend && pm2 start npm --name $INSTANCE_NAME-frontend -- start"
 sudo -u deploy bash -c "pm2 save"
 sudo -u deploy bash -c "pm2 startup"
 
-# 16. Configurar SSL
+# 9. Configurar SSL
 print_warning "Configure o domínio DNS antes de continuar:"
 print_info "  $DOMAIN -> $(curl -s ifconfig.me)"
 echo
@@ -308,13 +254,13 @@ else
     print_info "certbot --nginx -d $DOMAIN"
 fi
 
-# 17. Finalizar
+# 10. Finalizar
 echo
 echo "========================================"
-echo "    INSTALAÇÃO SIMPLES CONCLUÍDA!"
+echo "    INSTALAÇÃO CONCLUÍDA!"
 echo "========================================"
 echo
-print_status "Sistema FlowChat Simples instalado!"
+print_status "Sistema FlowChat instalado!"
 print_info "✅ Backend original (estável)"
 print_info "✅ Cores brasileiras aplicadas"
 echo
