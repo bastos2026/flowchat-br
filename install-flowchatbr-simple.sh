@@ -159,12 +159,14 @@ EOF
 # 12. Corrigir permissões do npm e instalar dependências
 print_status "Corrigindo permissões do npm..."
 mkdir -p /home/deploy/.npm
+mkdir -p /home/deploy/.cache
 chown -R deploy:deploy /home/deploy/.npm
+chown -R deploy:deploy /home/deploy/.cache
 chown -R deploy:deploy /home/deploy/.config 2>/dev/null || true
 
 print_status "Instalando dependências e fazendo build..."
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npm cache clean --force"
-sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npm install"
+sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && PUPPETEER_SKIP_DOWNLOAD=true npm install"
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npm run build"
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npx sequelize db:migrate"
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npx sequelize db:seed:all"
