@@ -89,6 +89,8 @@ apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 # 5. Instalar PM2
 print_status "Instalando PM2..."
 npm install -g pm2
+mkdir -p /home/deploy/.pm2
+chown -R deploy:deploy /home/deploy/.pm2 2>/dev/null || true
 
 # 6. Criar diretório da instância
 print_status "Criando estrutura de diretórios..."
@@ -150,13 +152,20 @@ REACT_APP_HOURS_CLOSE_TICKETS_AUTO=24
 REACT_APP_REACT_APP_URL_API=$BACKEND_URL
 EOF
 
-# 12. Instalar dependências e build
+# 12. Corrigir permissões do npm e instalar dependências
+print_status "Corrigindo permissões do npm..."
+mkdir -p /home/deploy/.npm
+chown -R deploy:deploy /home/deploy/.npm
+chown -R deploy:deploy /home/deploy/.config 2>/dev/null || true
+
 print_status "Instalando dependências e fazendo build..."
+sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npm cache clean --force"
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npm install"
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npm run build"
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npx sequelize db:migrate"
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/backend && npx sequelize db:seed:all"
 
+sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/frontend && npm cache clean --force"
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/frontend && npm install"
 sudo -u deploy bash -c "cd /home/deploy/$INSTANCE_NAME/frontend && npm run build"
 
